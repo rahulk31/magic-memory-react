@@ -1,7 +1,7 @@
 .card img {
     display: block;
-    width: 100px;
-    height: 100px;
+    width: 160px;
+    height: 160px;
     border: 2px solid #fff;
     border-radius: 6px;
 }
@@ -29,6 +29,13 @@
 .flipped .back {
   transform: rotateY(90deg);
   transition-delay: 0s;
+}
+
+@media screen and (max-width: 710px) {
+  .card img {
+    width: 80px;
+    height: 80px;
+  }
 }
 
 
