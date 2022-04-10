@@ -1,6 +1,6 @@
 import "./App.css";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import SingleCard from "./Components/SingleCard";
 
 import Confetti from "react-confetti";
@@ -21,9 +21,11 @@ function App() {
   const [turns, setTurns] = useState(0);
   const [disabled, setDisabled] = useState(false);
   const [confetti, setConfetti] = useState(12);
+  const [width, setWidth] = useState(null);
+  const [height, setHeight] = useState(null);
+  const confettiRef = useRef(null);
 
-  //* shuffle cards
-
+  //? shuffle cards
   const shuffleCards = () => {
     const shuffledCards = [...cardsDB, ...cardsDB]
       .sort(() => Math.random() - 0.5)
@@ -33,7 +35,14 @@ function App() {
     console.log(cards);
   };
 
-  useEffect(shuffleCards, []);
+  useEffect(() => {
+    //? Confetti height and width
+    setWidth(confettiRef.current.clientWidth);
+    setHeight(confettiRef.current.clientHeight);
+
+    //? Shuffling cards
+    shuffleCards();
+  }, []);
 
   const newGameHandler = () => {
     shuffleCards();
@@ -56,7 +65,7 @@ function App() {
     if (choiceOne && choiceTwo) {
       setDisabled(true);
       if (choiceOne.src === choiceTwo.src) {
-        setConfetti(confetti => confetti - 2);
+        setConfetti((confetti) => confetti - 2);
 
         console.log(confetti);
 
@@ -74,33 +83,32 @@ function App() {
     }
   }, [choiceOne, choiceTwo]);
 
-  
-
   return (
-    <div className="App">
-      <h1>Magic Match</h1>
-      <button onClick={newGameHandler}>New Game</button>
+    <>
+      <div ref={confettiRef} className="main-page">
+        {confetti === 0 ? <Confetti width={width} height={height} /> : null}
+        <div className="App">
+          <h1>Magic Match</h1>
+          <button onClick={newGameHandler}>New Game</button>
 
-      {confetti === 0 ? (<Confetti></Confetti>) : null}
+          <div className="card-grid">
+            {cards.map((card) => (
+              <SingleCard
+                key={card.id}
+                card={card}
+                setChoice={setChoice}
+                flipped={
+                  card === choiceOne || card === choiceTwo || card.matched
+                }
+                disabled={disabled}
+              />
+            ))}
+          </div>
 
-      <div className="card-grid">
-        {cards.map((card) => (
-          <SingleCard
-            key={card.id}
-            card={card}
-            setChoice={setChoice}
-            flipped={
-              card === choiceOne ||
-              card === choiceTwo ||
-              card.matched
-            }
-            disabled={disabled}
-          />
-        ))}
+          <p>Turns: {turns}</p>
+        </div>
       </div>
-
-      <p>Turns: {turns}</p>
-    </div>
+    </>
   );
 }
 
